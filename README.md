@@ -106,7 +106,7 @@ docker compose up --build
 | ![Kullanıcılar](docs/screenshots/10-kullanicilar.png) | ![Etiketler](docs/screenshots/11-etiketler.png) |
 | **Kullanıcılar** · roller ve birimler | **QR etiketleri** · toplu yazdırma |
 | ![Komut paleti](docs/screenshots/12-komut-paleti.png) | ![Koyu tema](docs/screenshots/13-koyu-tema.png) |
-| **Komut paleti** · ⌘K | **Koyu tema** |
+| **Komut paleti** · ⌘K | **Koyu tema** · envanter |
 
 <p>
   <img src="docs/screenshots/14-mobil-envanter.png" width="260" alt="Mobil envanter" />
