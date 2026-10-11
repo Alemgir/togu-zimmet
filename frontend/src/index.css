@@ -1,0 +1,184 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ───────── Tasarım belirteçleri ─────────
+   Göz yormayan, düşük kontrastlı yüzeyler; tek bir sakin vurgu rengi. */
+:root {
+  /* TOGÜ Kurumsal Kimlik Kılavuzu renkleri: mor #462B55, firuze #0098C0, bordo #910C32.
+     Firuze açık zeminde metin için yetersiz kontrastlı (3.2:1) olduğundan birincil renk mordur;
+     firuze vurgu/odak için, koyulaştırılmış hâli (#00748F) bağlantı/bilgi metni için kullanılır. */
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-2: #eceef1;
+  --surface-hover: #e3e6ea;
+  --border: #dfe2e7;
+  --border-strong: #c9ced6;
+  --fg: #1c1f24;
+  --fg-muted: #5f6670;
+  --fg-subtle: #59606a;
+
+  --accent: #462b55;
+  --accent-hover: #3c1953;
+  --accent-soft: rgb(70 43 85 / 0.11);
+  --accent-fg: #ffffff;
+
+  --teal: #0098c0;
+  --brand-purple: #462b55;
+  --tile-purple: #462b55;
+
+  --success: #17694a;
+  --warning: #855a08;
+  --danger: #910c32;
+  --info: #00677f;
+
+  --shadow-sm: 0 1px 2px rgb(28 31 36 / 0.07);
+  --shadow-md: 0 6px 20px -6px rgb(28 31 36 / 0.16), 0 1px 3px rgb(28 31 36 / 0.07);
+  --shadow-lg: 0 28px 64px -16px rgb(28 31 36 / 0.3);
+
+  /* Kenar çubuğu: gop.edu.tr footer kömürü */
+  --sb: #21252b;
+  --sb-fg: #aab1ba;
+  --sb-title: #ffffff;
+  --sb-active: #2e343c;
+  --sb-hover: rgb(255 255 255 / 0.06);
+  --sb-border: rgb(255 255 255 / 0.12);
+  --ring: rgb(0 152 192 / 0.35);
+  --avatar-l: 0.42;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #14161a;
+  --surface: #1b1e23;
+  --surface-2: #23272d;
+  --surface-hover: #2b3036;
+  --border: #2e343c;
+  --border-strong: #3c444e;
+  --fg: #eceef1;
+  --fg-muted: #9aa2ac;
+  --fg-subtle: #8a929c;
+
+  --accent: #1fb0d3;
+  --accent-hover: #3cc3e4;
+  --accent-soft: rgb(31 176 211 / 0.16);
+  --accent-fg: #06222b;
+
+  --teal: #1fb0d3;
+  --brand-purple: #b58bd6;
+  --tile-purple: #8d5fb0;
+
+  --success: #5fd3a0;
+  --warning: #e8b64a;
+  --danger: #ff8aa5;
+  --info: #4cc6e6;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 8px 24px -6px rgb(0 0 0 / 0.5), 0 1px 3px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 32px 72px -16px rgb(0 0 0 / 0.7);
+
+  --sb: #0f1114;
+  --sb-fg: #9aa2ac;
+  --sb-title: #ffffff;
+  --sb-active: #23272d;
+  --sb-hover: rgb(255 255 255 / 0.05);
+  --sb-border: rgb(255 255 255 / 0.1);
+  --ring: rgb(31 176 211 / 0.45);
+  --avatar-l: 0.82;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-hover: var(--surface-hover);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-fg: var(--accent-fg);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --color-teal: var(--teal);
+  --color-sb: var(--sb);
+  --color-sb-fg: var(--sb-fg);
+  --color-sb-title: var(--sb-title);
+  --color-sb-active: var(--sb-active);
+  --color-sb-hover: var(--sb-hover);
+  --color-sb-border: var(--sb-border);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --radius-xl: 0.9rem;
+  --radius-2xl: 1.15rem;
+}
+
+@layer base {
+  * { border-color: var(--border); }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  ::selection { background: var(--accent-soft); }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: 6px; }
+  button, [role='button'] { cursor: pointer; }
+  button:disabled { cursor: not-allowed; }
+  /* Sakin, ince kaydırma çubukları */
+  * { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+}
+
+/* Çok hafif arka plan ışıması: göz yormaz, derinlik katar */
+.ambient::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 36rem at 85% -10%, var(--accent-soft), transparent 60%),
+    radial-gradient(44rem 30rem at -10% 110%, color-mix(in srgb, var(--teal) 9%, transparent), transparent 60%);
+}
+
+.lt, .lw { transform-box: fill-box; transform-origin: center; }
+
+.shimmer {
+  background: linear-gradient(100deg, var(--surface-2) 30%, var(--surface-hover) 50%, var(--surface-2) 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; color: #000; }
+  /* Gizlenen sayfa içeriği (visibility) yer kaplamaya devam eder → boş ikinci sayfa çıkmasın */
+  html:has(.print-area), body:has(.print-area) { height: 100vh; overflow: hidden; }
+}
+
+/* Resmî belgeler (tutanak, föy, etiket): yalnızca belge yazdırılır */
+@media print {
+  @page { size: A4; margin: 12mm; }
+  .print-doc, .print-doc * { visibility: visible; }
+  .print-doc { position: absolute; left: 0; top: 0; width: 100%; max-width: none !important; margin: 0 !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
+  .no-print { display: none !important; }
+  .label-sheet { gap: 0 !important; }
+}
