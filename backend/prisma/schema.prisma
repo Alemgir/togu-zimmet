@@ -1,0 +1,240 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  UNIT_MANAGER // Birim sorumlusu: yalnızca kendi biriminin cihaz/zimmet/arızalarını görür
+  STAFF
+}
+
+enum FaultStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+enum CountStatus {
+  OPEN
+  CLOSED
+}
+
+enum NotificationType {
+  FAULT_REPORTED
+  FAULT_UPDATED
+  ASSIGNED
+  RETURNED
+  WARRANTY_EXPIRING
+  ASSIGNMENT_DUE
+  ASSIGNMENT_OVERDUE
+}
+
+// IN_STOCK = Depoda (boşta), ASSIGNED = Zimmetli (aktif kullanımda),
+// FAULTY = Arızalı, RETIRED = Hizmet dışı
+enum DeviceStatus {
+  IN_STOCK
+  ASSIGNED
+  FAULTY
+  RETIRED
+}
+
+enum ReturnReason {
+  MANUAL // Yönetici tarafından zimmetten düşüldü
+  FAULT_REPORTED // Arıza bildirildi, otomatik düşüldü
+  USER_DEACTIVATED // Kullanıcı pasife alındı/silindi, otomatik düşüldü
+  RETIRED // Cihaz hizmet dışı bırakıldı, otomatik düşüldü
+  REASSIGNED // Başka personele devredildi
+}
+
+enum EventType {
+  CREATED
+  UPDATED
+  ASSIGNED
+  RETURNED
+  STATUS_CHANGED
+  FAULT_REPORTED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(STAFF)
+  department   String?
+  title        String?
+  isActive     Boolean  @default(true)
+  // Şifre değişince/oturum sonlandırılınca artırılır; eski JWT'ler geçersiz olur
+  tokenVersion Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  assignments    Assignment[]   @relation("AssignedTo")
+  assignedByMe   Assignment[]   @relation("AssignedBy")
+  returnedByMe   Assignment[]   @relation("ReturnedBy")
+  events         DeviceEvent[]
+  reportedFaults FaultTicket[]  @relation("ReportedFaults")
+  handledFaults  FaultTicket[]  @relation("HandledFaults")
+  notifications  Notification[]
+  countSessions  CountSession[]
+  countScans     CountItem[]
+
+  @@index([department])
+}
+
+model Device {
+  id           String       @id @default(cuid())
+  // Okunabilir benzersiz demirbaş numarası: TOGU-000001
+  assetTag     String       @unique
+  // Yerleşik kodlar (LAPTOP, MONITOR…) ya da kullanıcının yazdığı özel tür adı (örn. "Projeksiyon")
+  type         String       @default("OTHER")
+  brand        String
+  model        String
+  serialNumber String       @unique
+  purchaseDate DateTime
+  warrantyEnd  DateTime?
+  status       DeviceStatus @default(IN_STOCK)
+  location     String?
+  notes        String?
+  // QR kodun içerdiği benzersiz, tahmin edilemez token
+  qrToken      String       @unique @default(cuid())
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  assignments Assignment[]
+  events      DeviceEvent[]
+  faults      FaultTicket[]
+  countItems  CountItem[]
+
+  @@index([status])
+  @@index([type])
+  @@index([brand, model])
+}
+
+// Zimmet kaydı. returnedAt NULL ise zimmet hâlâ aktiftir.
+// Bir cihazın aynı anda yalnızca bir aktif zimmeti olabilir
+// (migration'daki kısmi unique index ile veritabanı seviyesinde garanti edilir).
+model Assignment {
+  id           String        @id @default(cuid())
+  deviceId     String
+  userId       String
+  assignedById String
+  assignedAt   DateTime      @default(now())
+  returnedAt   DateTime?
+  returnedById String?
+  returnReason ReturnReason?
+  note         String?
+  returnNote   String?
+  // Planlı iade tarihi (geçici görevlendirme vb.). Geçince "gecikmiş" sayılır ve hatırlatma gider.
+  dueAt        DateTime?
+  // Zimmet teslim tutanağı numarası (ZT-2026-000012)
+  receiptNo    Int           @unique @default(autoincrement())
+
+  device     Device @relation(fields: [deviceId], references: [id], onDelete: Restrict)
+  user       User   @relation("AssignedTo", fields: [userId], references: [id], onDelete: Restrict)
+  assignedBy User   @relation("AssignedBy", fields: [assignedById], references: [id], onDelete: Restrict)
+  returnedBy User?  @relation("ReturnedBy", fields: [returnedById], references: [id], onDelete: Restrict)
+
+  @@index([deviceId, returnedAt])
+  @@index([userId, returnedAt])
+}
+
+// Cihazın denetim izi (audit log / zaman çizelgesi)
+model DeviceEvent {
+  id        String    @id @default(cuid())
+  deviceId  String
+  type      EventType
+  actorId   String?
+  message   String
+  meta      Json?
+  createdAt DateTime  @default(now())
+
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  actor  User?  @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([deviceId, createdAt])
+}
+
+// Okunabilir demirbaş numarası için sayaç
+model Counter {
+  key   String @id
+  value Int    @default(0)
+}
+
+// Arıza / bakım kaydı. Bir cihazın aynı anda en fazla bir açık (çözülmemiş) kaydı olur.
+model FaultTicket {
+  id           String      @id @default(cuid())
+  ticketNo     Int         @unique @default(autoincrement())
+  deviceId     String
+  reportedById String?
+  handledById  String?
+  status       FaultStatus @default(OPEN)
+  description  String
+  resolution   String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  resolvedAt   DateTime?
+
+  device     Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  reportedBy User?  @relation("ReportedFaults", fields: [reportedById], references: [id], onDelete: SetNull)
+  handledBy  User?  @relation("HandledFaults", fields: [handledById], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([deviceId, status])
+}
+
+// Envanter sayımı: beklenen cihazlar oturum açılırken listelenir, okutuldukça işaretlenir.
+model CountSession {
+  id          String      @id @default(cuid())
+  name        String
+  location    String?
+  status      CountStatus @default(OPEN)
+  createdById String
+  createdAt   DateTime    @default(now())
+  closedAt    DateTime?
+
+  createdBy User        @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  items     CountItem[]
+
+  @@index([status, createdAt])
+}
+
+model CountItem {
+  id          String    @id @default(cuid())
+  sessionId   String
+  deviceId    String
+  // false: sayım listesinde olmayan ama okutulan ("beklenmeyen") cihaz
+  expected    Boolean   @default(true)
+  scannedAt   DateTime?
+  scannedById String?
+
+  session   CountSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  device    Device       @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  scannedBy User?        @relation(fields: [scannedById], references: [id], onDelete: SetNull)
+
+  @@unique([sessionId, deviceId])
+  @@index([sessionId, scannedAt])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  body      String
+  link      String?
+  // Zamana bağlı uyarıların (garanti, gecikme) tekrar üretilmesini önler
+  dedupeKey String?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dedupeKey])
+  @@index([userId, readAt, createdAt])
+}
