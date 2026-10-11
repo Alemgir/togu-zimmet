@@ -1,0 +1,56 @@
+# Tek komutla çalıştırma:  docker compose up --build
+# Uygulama:  http://localhost:8080   ·   API dokümantasyonu: http://localhost:8080/docs
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: zimmet-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-zimmet}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-zimmet_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-zimmet}
+    ports:
+      - "${DB_PORT:-5440}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-zimmet} -d ${POSTGRES_DB:-zimmet}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: zimmet-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-zimmet}:${POSTGRES_PASSWORD:-zimmet_pass}@db:5432/${POSTGRES_DB:-zimmet}?schema=public
+      JWT_SECRET: ${JWT_SECRET:-change-me-to-a-long-random-string-min-32-chars}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-8h}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:8080}
+      APP_URL: ${APP_URL:-http://localhost:8080}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@gop.edu.tr}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Admin123!}
+      SEED_DEMO: ${SEED_DEMO:-true}
+    ports:
+      - "${API_PORT:-3000}:3000"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_DEMO_LOGIN: ${VITE_DEMO_LOGIN:-true}
+    container_name: zimmet-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${WEB_PORT:-8080}:80"
+
+volumes:
+  pgdata:
