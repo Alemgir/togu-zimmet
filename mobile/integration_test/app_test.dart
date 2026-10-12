@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:togu_zimmet/main.dart' as app;
@@ -10,11 +12,14 @@ Future<void> wait(WidgetTester t, [int ms = 1500]) async {
 }
 
 void main() {
-  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
+  // Ekran görüntüsü: test bir işaret dosyası bırakır, bilgisayardaki döngü (tool/shots.sh) simülatörden görüntüyü alır.
   Future<void> shot(WidgetTester t, String name) async {
     await wait(t, 900);
-    await binding.takeScreenshot(name);
+    const dir = String.fromEnvironment('SHOTS_DIR');
+    if (dir.isNotEmpty) File('$dir/$name.req').writeAsStringSync('');
+    await wait(t, 1700);
   }
 
   testWidgets('yönetici akışı', (t) async {

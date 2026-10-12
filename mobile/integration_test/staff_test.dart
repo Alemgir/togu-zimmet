@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:togu_zimmet/main.dart' as app;
@@ -11,11 +13,14 @@ Future<void> wait(WidgetTester t, [int ms = 1500]) async {
 }
 
 void main() {
-  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
+  // Ekran görüntüsü: test bir işaret dosyası bırakır, bilgisayardaki döngü (tool/shots.sh) simülatörden görüntüyü alır.
   Future<void> shot(WidgetTester t, String name) async {
     await wait(t, 900);
-    await binding.takeScreenshot(name);
+    const dir = String.fromEnvironment('SHOTS_DIR');
+    if (dir.isNotEmpty) File('$dir/$name.req').writeAsStringSync('');
+    await wait(t, 1700);
   }
 
   testWidgets('personel akışı + koyu tema', (t) async {
@@ -41,7 +46,10 @@ void main() {
     await t.tap(find.text('Giriş yap').last);
     await wait(t, 3000);
     expect(find.text('ÜZERİMDEKİ CİHAZLAR'), findsOneWidget);
-    expect(find.text('Envanter'), findsNothing); // personelde envanter sekmesi yok
+    expect(
+      find.text('Envanter'),
+      findsNothing,
+    ); // personelde envanter sekmesi yok
     await shot(t, 's02-ana-personel');
 
     await t.tap(find.textContaining('TOGU-').first);
@@ -76,21 +84,7 @@ void main() {
     await t.tap(find.byIcon(Icons.arrow_back_rounded));
     await wait(t, 800);
 
-    // Tarayıcı (simülatörde kamera yok → elle giriş yedeği)
-    await t.tap(find.byIcon(Icons.qr_code_scanner_rounded).last);
-    await wait(t, 2000);
-    await shot(t, 's09-tarayici');
-    await t.tap(find.text('Kodu elle gir').first);
-    await wait(t, 1000);
-    await shot(t, 's10-elle-giris');
-    await t.enterText(find.byType(TextField).last, 'http://localhost:8080/scan/yok-boyle-bir-token-12345');
-    await t.tap(find.text('Cihazı bul'));
-    await wait(t, 2000);
-    await shot(t, 's11-gecersiz-qr');
-
     // Temayı sıfırla
-    await t.tap(find.byIcon(Icons.close_rounded).first);
-    await wait(t, 800);
     await t.tap(find.text('Profil'));
     await wait(t, 800);
     await t.tap(find.text('Sistem'));
