@@ -21,6 +21,7 @@ Kurumdaki bilgisayar, sunucu, monitör gibi donanımların envantere kaydedildi�
 - [Hızlı başlangıç (tek komut)](#hızlı-başlangıç-tek-komut)
 - [Özellikler](#özellikler)
 - [Ekran görüntüleri](#ekran-görüntüleri)
+- [Mobil uygulama](#mobil-uygulama-flutter)
 - [Otomatik tutarlılık kuralları](#otomatik-tutarlılık-kuralları)
 - [Roller ve yetkiler](#roller-ve-yetkiler)
 - [Testler](#testler)
@@ -36,6 +37,7 @@ Kurumdaki bilgisayar, sunucu, monitör gibi donanımların envantere kaydedildi�
 |---|---|
 | **Backend** | Node.js · Fastify 5 · TypeScript · Prisma 6 · PostgreSQL 16 · JWT · Zod · Swagger/OpenAPI |
 | **Frontend** | React 19 · Vite · TypeScript · Tailwind CSS 4 · TanStack Query · Radix UI · Framer Motion · Recharts |
+| **Mobil** | Flutter 3 · Riverpod · go_router · Dio · mobile_scanner (QR) · flutter_secure_storage |
 | **Altyapı** | Docker · docker-compose · nginx |
 | **Test** | Vitest (backend entegrasyon + frontend bileşen) · Playwright (uçtan uca) · axe-core (erişilebilirlik) |
 
@@ -112,6 +114,18 @@ docker compose up --build
   <img src="docs/screenshots/14-mobil-envanter.png" width="260" alt="Mobil envanter" />
   <img src="docs/screenshots/15-mobil-personel.png" width="260" alt="Mobil personel ekranı" />
 </p>
+
+## Mobil uygulama (Flutter)
+
+Aynı API'ye bağlanan saha uygulaması (`mobile/`): güvenli giriş, **kamerayla QR okutup** cihaz bilgisini (garanti, alım tarihi, kimde olduğu) görme, sahada **teslim et · geri kabul et · arıza bildir** ve kişisel zimmet ekranı. İşlemler role göre açılır; yetkileri sunucu zorlar. Kurulum ve çalıştırma: [`mobile/README.md`](mobile/README.md).
+
+| ![Giriş](docs/screenshots/mobil/01-giris.png) | ![Ana sayfa](docs/screenshots/mobil/02-ana-yonetici.png) | ![Cihaz detayı](docs/screenshots/mobil/03-cihaz-detay.png) | ![Teslim et](docs/screenshots/mobil/04-teslim-et.png) |
+|:-:|:-:|:-:|:-:|
+| **Giriş** | **Ana sayfa** (yönetici) | **Cihaz detayı** | **Personele teslim et** |
+
+| ![Geri kabul](docs/screenshots/mobil/05-geri-kabul.png) | ![Personel](docs/screenshots/mobil/06-ana-personel.png) | ![Arıza](docs/screenshots/mobil/07-ariza-bildir.png) | ![Koyu](docs/screenshots/mobil/09-koyu-tema.png) |
+|:-:|:-:|:-:|:-:|
+| **Geri kabul** | **Kişisel zimmet** (personel) | **Arıza bildir** | **Koyu tema** |
 
 ## Otomatik tutarlılık kuralları
 
@@ -235,6 +249,7 @@ Arayüz, **Tokat Gaziosmanpaşa Üniversitesi Kurumsal Kimlik Kılavuzu**na gör
 > Logo ve kurumsal kimlik öğeleri Tokat Gaziosmanpaşa Üniversitesi'ne aittir; yalnızca üniversite projesi kapsamında kullanılmıştır.
 
 ## Yol haritası
-- [ ] **Flutter mobil uygulama:** giriş, QR okutma ve cihaz detayı, sahada teslim et / geri kabul et / arıza bildir, kişisel zimmet ekranı. Mevcut API ve `/scan/:token` QR bağlantısı hazırdır.
+- [x] **Flutter mobil uygulama** (`mobile/`): giriş, QR okutma, saha işlemleri ve kişisel zimmet ekranı.
+- [ ] **Mobil:** push bildirimleri ve çevrimdışı önbellek.
 - [ ] **Kurumsal kimlik doğrulama:** AD/LDAP veya SSO entegrasyonu.
 - [ ] **Kullanıcı eylemleri için denetim kaydı** (giriş denemeleri, rol değişiklikleri).
