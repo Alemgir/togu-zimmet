@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -68,7 +69,13 @@ class ZimmetApp extends ConsumerWidget {
       localizationsDelegates: const [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
       builder: (context, child) {
         final dark = Theme.of(context).brightness == Brightness.dark;
-        return AnnotatedRegion<SystemUiOverlayStyle>(value: dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark, child: child!);
+        var body = child!;
+        // Web önizlemede telefon çerçevesi (çentik + ana ekran çubuğu) için güvenli alan payı bırak
+        if (kIsWeb && Uri.base.queryParameters.containsKey('cerceve')) {
+          final m = MediaQuery.of(context);
+          body = MediaQuery(data: m.copyWith(padding: m.padding.copyWith(top: 38, bottom: 18)), child: body);
+        }
+        return AnnotatedRegion<SystemUiOverlayStyle>(value: dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark, child: body);
       },
     );
   }

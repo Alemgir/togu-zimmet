@@ -11,7 +11,7 @@ server {
   index index.html;
 
   gzip on;
-  gzip_types text/css application/javascript application/json image/svg+xml;
+  gzip_types text/css text/javascript application/javascript application/json application/wasm image/svg+xml;
 
   location /api/ {
     proxy_pass ${BACKEND_URL};
@@ -27,6 +27,13 @@ server {
     expires 1y;
     add_header Cache-Control "public, immutable";
     try_files $uri =404;
+  }
+
+  # Mobil uygulamanın web önizlemesi (Flutter, mobile/tool/build_web.sh ile derlenir)
+  location = /mobil { return 301 /mobil/; }
+  location /mobil/ {
+    try_files $uri $uri/ /mobil/index.html;
+    add_header Cache-Control "no-cache";
   }
 
   # React Router: bilinmeyen yolları index.html'e yönlendir

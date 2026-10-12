@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="TOGÜ IT Demirbaş ve Zimmet · mobil uygulama (web önizleme)">
+  <meta name="theme-color" content="#21252b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="TOGÜ Zimmet">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="manifest" href="manifest.json">
+  <title>TOGÜ Zimmet · Mobil</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #14161a; font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; }
+    #ekran { position: fixed; inset: 0; background: #21252b; }
+    #yan, #cerceve-ust, #cerceve-alt { display: none; }
+    #yukleniyor { position: fixed; inset: 0; display: grid; place-items: center; color: #aab1ba; font-size: 14px; pointer-events: none; transition: opacity .3s; }
+    body.hazir #yukleniyor { opacity: 0; }
+
+    /* Geniş ekran: telefon çerçevesi + açıklama. Dar ekran (gerçek telefon): tam ekran uygulama. */
+    @media (min-width: 760px) and (min-height: 600px) {
+      body { display: flex; align-items: center; justify-content: center; gap: 72px;
+             background: radial-gradient(900px 600px at 15% 10%, rgba(0,152,192,.16), transparent 60%),
+                         radial-gradient(800px 600px at 90% 90%, rgba(70,43,85,.35), transparent 60%), #14161a; }
+      #yan { display: block; max-width: 340px; color: #eceef1; }
+      #yan h1 { font-size: 28px; line-height: 1.2; margin: 0 0 12px; letter-spacing: -.4px; }
+      #yan p { color: #9aa2ac; line-height: 1.55; margin: 0 0 18px; font-size: 15px; }
+      #yan table { border-collapse: collapse; font-size: 13.5px; width: 100%; }
+      #yan td { padding: 7px 0; border-top: 1px solid #2e343c; color: #9aa2ac; }
+      #yan td:first-child { color: #eceef1; font-weight: 600; padding-right: 14px; white-space: nowrap; }
+      #yan code { color: #1fb0d3; }
+      #yan a { color: #1fb0d3; }
+      #telefon { position: relative; width: 390px; height: min(844px, calc(100vh - 48px)); border-radius: 54px; padding: 11px;
+                 background: #0b0c0e; box-shadow: 0 0 0 2px #2b2f36, 0 40px 90px -20px rgba(0,0,0,.8); flex: none; }
+      #ekran { position: relative; inset: auto; width: 100%; height: 100%; border-radius: 44px; overflow: hidden; }
+      #cerceve-ust { display: block; position: absolute; top: 22px; left: 50%; width: 112px; height: 32px; margin-left: -56px;
+                     background: #000; border-radius: 20px; z-index: 5; pointer-events: none; }
+      #cerceve-alt { display: block; position: absolute; bottom: 20px; left: 50%; width: 132px; height: 5px; margin-left: -66px;
+                     background: rgba(128,128,128,.7); border-radius: 9px; z-index: 5; pointer-events: none; }
+    }
+  </style>
+</head>
+<body>
+  <aside id="yan">
+    <h1>IT Demirbaş ve Zimmet<br>Mobil uygulama</h1>
+    <p>Flutter ile yazılan saha uygulamasının tarayıcıda çalışan hâli. Web sistemiyle aynı API'ye bağlanır; bilgisayarda gördüğünüz çerçeve yalnızca sunum içindir, telefonda bu sayfa tam ekran açılır.</p>
+    <table>
+      <tr><td>Yönetici</td><td><code>admin@gop.edu.tr</code> · <code>Admin123!</code></td></tr>
+      <tr><td>Personel</td><td><code>ayse.yilmaz@gop.edu.tr</code> · <code>Demo1234</code></td></tr>
+    </table>
+    <p style="margin-top:18px;font-size:13px">Giriş ekranındaki demo butonları da bu bilgileri doldurur. QR okutma için tarayıcı kamera izni ister; kamera yoksa kodu elle girebilirsiniz. <a href="../">← Web uygulaması</a></p>
+  </aside>
+  <div id="telefon">
+    <div id="cerceve-ust"></div>
+    <div id="ekran"></div>
+    <div id="cerceve-alt"></div>
+  </div>
+  <div id="yukleniyor">Yükleniyor…</div>
+  <script>
+    // Çerçeveli (geniş ekran) modda uygulamaya haber ver: durum çubuğu payı bırakır.
+    if (matchMedia('(min-width: 760px) and (min-height: 600px)').matches && !location.search.includes('cerceve')) {
+      history.replaceState(null, '', '?cerceve=1' + location.hash);
+    }
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

@@ -1,71 +1,87 @@
-# TOGÜ Zimmet · Mobil uygulama (Flutter)
+# TOGÜ Zimmet · Mobil uygulama
 
-Web sistemiyle aynı API'ye bağlanan saha uygulaması: cihazın QR kodunu okut, bilgilerini gör, yerinde teslim et / geri kabul et / arıza bildir.
+Web sistemiyle aynı API'ye bağlanan Flutter uygulaması. Amaç sahada kullanmak: cihazın QR kodunu okut, bilgilerine bak, yerinde teslim et, geri al ya da arıza bildir.
 
-| Okulun mobil isteri | Uygulamada |
+Okulun mobil için istediği dört madde ve karşılıkları:
+
+| İster | Uygulamada |
 |---|---|
-| Kullanıcı adı/şifre ile güvenli giriş | JWT, token `flutter_secure_storage` (iOS Keychain / Android Keystore) içinde; 401'de otomatik çıkış |
-| QR okuma ve cihaz tanıma | `mobile_scanner` ile kamera; garanti, alım tarihi, **kimde olduğu**, konum, geçmiş. Simülatör/izin yoksa "kodu elle gir" yedeği |
-| Personele teslim et · geri kabul · arıza bildir | Cihaz detayında, **role ve cihaz durumuna göre** görünen işlem butonları |
-| Kişisel zimmet ekranı | Ana sayfada "Üzerimdeki cihazlar" ve her cihaz için ayrıntı sayfası |
+| Kullanıcı adı/şifre ile güvenli giriş | JWT. Token `flutter_secure_storage` ile saklanıyor (iOS Keychain / Android Keystore). Oturum geçersizse otomatik çıkış yapılıyor. |
+| QR okuma ve cihaz tanıma | `mobile_scanner` ile kamera. Garanti, alım tarihi, kimde olduğu, konum ve geçmiş gösteriliyor. Kamera yoksa ya da izin verilmediyse kodu elle girmek için bir ekran var. |
+| Personele teslim, geri kabul, arıza bildirme | Cihaz detayında, kullanıcının rolüne ve cihazın durumuna göre görünen butonlar. |
+| Kişisel zimmet ekranı | Ana sayfada "Üzerimdeki cihazlar", her birinin ayrıntı sayfası. |
 
-Ek olarak: bildirimler (okunmamış rozeti), yönetici/birim sorumlusu için envanter arama + durum filtresi ve özet sayaçlar, şifre değiştirme, açık/koyu/sistem teması, ayarlanabilir sunucu adresi.
+Ayrıca bildirimler, yönetici ve birim sorumluları için envanter arama/filtre, şifre değiştirme, açık/koyu tema ve ayarlanabilir sunucu adresi var.
 
-## Yetkiler (web ile aynı kurallar, sunucu zorlar)
+## Yetkiler
+
+Kurallar webdekiyle aynı, sunucu denetliyor. Uygulama sadece yetkisiz butonları göstermiyor.
 
 | İşlem | Yönetici | Birim sorumlusu | Personel |
 |---|:-:|:-:|:-:|
-| QR okut, cihaz bilgisini gör | ✅ | ✅ | ✅ |
-| Personele teslim et / geri kabul et | ✅ | – | – |
-| Arıza bildir | her cihaz | biriminin cihazı | kendi cihazı |
-| Envanter sekmesi | ✅ | ✅ (kendi birimi) | – |
+| QR okutup cihaz bilgisini görme | evet | evet | evet |
+| Personele teslim, geri kabul | evet | hayır | hayır |
+| Arıza bildirme | her cihaz | biriminin cihazı | kendi cihazı |
+| Envanter sekmesi | evet | evet (kendi birimi) | yok |
 
 ## Çalıştırma
 
-Gereksinim: Flutter 3.38+ (Dart 3.10+). Android için Android SDK, iOS için Xcode.
+Flutter 3.38 ve üstü gerekiyor. Android için Android SDK, iOS için Xcode lazım.
 
 ```bash
 cd mobile
 flutter pub get
-flutter run                                   # varsayılan: canlı demo sunucusu
+flutter run
 ```
 
-Sunucu adresi (API) üç şekilde verilebilir:
+Varsayılan olarak canlı demo sunucusuna bağlanır. Başka bir sunucu için:
 
 ```bash
-# 1) Derleme zamanı
-flutter run --dart-define=API_URL=http://localhost:3000/api          # iOS simülatör + yerel Docker
-flutter run --dart-define=API_URL=http://10.0.2.2:3000/api           # Android emülatör + yerel Docker
-# 2) Uygulama içinden: giriş ekranı altındaki "Sunucu" ya da Profil → Sunucu adresi
-#    (gerçek telefonda bilgisayarın ağ adresi: http://192.168.x.x:3000/api)
+# iOS simülatörü + bilgisayarda çalışan Docker
+flutter run --dart-define=API_URL=http://localhost:3000/api
+
+# Android emülatörü + bilgisayarda çalışan Docker
+flutter run --dart-define=API_URL=http://10.0.2.2:3000/api
 ```
 
-Demo hesap butonlarını gizlemek için: `--dart-define=DEMO_LOGIN=false`.
+Adres uygulama içinden de değiştirilebiliyor (giriş ekranının altındaki "Sunucu" ya da Profil > Sunucu adresi). Gerçek telefonda bilgisayarın yerel ağ adresi girilmeli, örneğin `http://192.168.1.20:3000/api`.
 
-> Gerçek cihazda QR okutmak için sunucudaki `APP_URL`, ürettiği QR kodların işaret ettiği adrestir; uygulama hem tam bağlantıyı (`…/scan/<token>`) hem de çıplak token'ı tanır.
+Demo hesap butonlarını gizlemek için `--dart-define=DEMO_LOGIN=false`.
+
+QR kodların içindeki adres sunucudaki `APP_URL` ayarından geliyor. Uygulama hem tam bağlantıyı (`.../scan/<token>`) hem de sadece token'ı tanıyor.
+
+## Tarayıcıda deneme
+
+Uygulamanın web derlemesi ana sitenin içinde `/mobil/` adresinde duruyor (`frontend/public/mobil`). Docker ile `http://localhost:8080/mobil/`, canlı demoda ise sitenin `/mobil/` yolu. Geniş ekranda telefon çerçevesinin içinde, telefonda tam ekran açılıyor. Kamera izni tarayıcıdan isteniyor.
+
+Kodda değişiklik yaparsanız önizlemeyi şu komutla yeniden derleyin:
+
+```bash
+mobile/tool/build_web.sh
+```
 
 ## Testler
 
 ```bash
-flutter test                                                       # birim testleri (QR ayrıştırma, biçimleme)
-
-# Uçtan uca (simülatörde gerçek API ile; yerel docker stack ayakta olmalı)
-flutter drive --driver=test_driver/driver.dart \
-  --target=integration_test/app_test.dart -d <simulator-id> \
-  --dart-define=API_URL=http://localhost:3000/api                  # yönetici: giriş → envanter → teslim → geri kabul
-flutter drive --driver=test_driver/driver.dart \
-  --target=integration_test/staff_test.dart -d <simulator-id> \
-  --dart-define=API_URL=http://localhost:3000/api                  # personel: yetkiler, arıza, bildirim, koyu tema, QR
+flutter test    # birim testleri (QR bağlantısı ayrıştırma, biçimlendirme)
 ```
 
-## Yapı
+Simülatörde gerçek API'ye karşı çalışan entegrasyon testleri de var (yerel Docker ayakta olmalı):
+
+```bash
+flutter drive --driver=test_driver/driver.dart \
+  --target=integration_test/app_test.dart -d <simülatör-id> \
+  --dart-define=API_URL=http://localhost:3000/api
+```
+
+`app_test.dart` yönetici akışını (giriş, envanter, teslim etme, geri kabul), `staff_test.dart` personel akışını (yetkiler, arıza sayfası, bildirimler, koyu tema), `scanner_test.dart` tarayıcı ekranını dener. Ekran görüntüsü almak için `tool/shots.sh` testle birlikte arka planda çalıştırılıyor.
+
+## Klasörler
 
 ```
 lib/
-  core/      api (Dio), modeller, tema (web ile aynı tasarım belirteçleri), resmî logo
+  core/      API istemcisi (Dio), modeller, tema, logo
   state/     Riverpod: oturum, veri sağlayıcıları, tema
-  screens/   giriş · ana sayfa · envanter · cihaz detayı · işlem sayfaları · tarayıcı · bildirim · profil
-  widgets/   ortak bileşenler (kart, düğme, toast, iskelet yükleme, logo animasyonu)
+  screens/   giriş, ana sayfa, envanter, cihaz detayı, işlem sayfaları, tarayıcı, bildirimler, profil
+  widgets/   ortak bileşenler
 ```
-
-Teknolojiler: Flutter · Riverpod · go_router · Dio · mobile_scanner · flutter_secure_storage.

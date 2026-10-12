@@ -91,6 +91,11 @@ export default function Login() {
             <Button size="sm" onClick={() => fill('ayse.yilmaz@gop.edu.tr', 'Demo1234')}>Personel</Button>
           </div>
         )}
+        {DEMO && (
+          <p className="mt-3 text-center text-xs">
+            <a href="/mobil/" className="text-fg-subtle underline-offset-2 hover:underline">Mobil uygulamayı tarayıcıda dene</a>
+          </p>
+        )}
         <p className="mt-5 text-center text-[11.5px] text-fg-subtle">TOGÜ Yapay Zeka ve Dijital Dönüşüm Koordinatörlüğü</p>
       </motion.div>
     </div>
