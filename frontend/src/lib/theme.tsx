@@ -10,7 +10,7 @@ const ThemeCtx = createContext<Ctx | null>(null);
 const mq = () => matchMedia('(prefers-color-scheme: dark)');
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(() => (localStorage.getItem('theme') as Theme) || 'system');
+  const [theme, setThemeState] = useState<Theme>(() => (localStorage.getItem('theme') as Theme) || 'light');
   const [systemDark, setSystemDark] = useState(() => mq().matches);
 
   useEffect(() => {

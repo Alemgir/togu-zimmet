@@ -10,7 +10,7 @@
     <script>
       // Tema titremesini önlemek için ilk boyamadan önce uygula
       try {
-        var t = localStorage.getItem('theme') || 'system';
+        var t = localStorage.getItem('theme') || 'light';
         var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
         if (dark) document.documentElement.classList.add('dark');
       } catch (e) {}

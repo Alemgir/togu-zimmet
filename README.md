@@ -24,7 +24,6 @@ Canlı adresler geçici bir yayın. Asıl teslim biçimi aşağıdaki Docker kur
 - [Yerel geliştirme](#yerel-geliştirme)
 - [Proje yapısı](#proje-yapısı)
 - [Tasarım](#tasarım)
-- [Yapılacaklar](#yapılacaklar)
 
 ## Teknolojiler
 
@@ -250,9 +249,3 @@ Arayüz Tokat Gaziosmanpaşa Üniversitesi Kurumsal Kimlik Kılavuzu'na göre ya
 Resmî logo kılavuzdaki kurallara uygun kullanılıyor, renk ve oranı değiştirilmedi. Koyu zeminde orijinal renkleri bozulmasın diye beyaz bir plaka üzerinde duruyor.
 
 Logo ve kurumsal kimlik öğeleri Tokat Gaziosmanpaşa Üniversitesi'ne ait, burada yalnızca bu başvuru projesi için kullanıldı.
-
-## Yapılacaklar
-- [x] Flutter mobil uygulama
-- [ ] Mobil için push bildirimleri ve çevrimdışı önbellek
-- [ ] AD/LDAP veya SSO ile giriş
-- [ ] Kullanıcı eylemleri için denetim kaydı (giriş denemeleri, rol değişiklikleri)

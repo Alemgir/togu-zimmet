@@ -70,10 +70,10 @@ class ZimmetApp extends ConsumerWidget {
       builder: (context, child) {
         final dark = Theme.of(context).brightness == Brightness.dark;
         var body = child!;
-        // Web önizlemede telefon çerçevesi (çentik + ana ekran çubuğu) için güvenli alan payı bırak
+        // Web önizlemede telefon çerçevesi: iPhone 17 Pro güvenli alanları (üst 62, alt 34)
         if (kIsWeb && Uri.base.queryParameters.containsKey('cerceve')) {
           final m = MediaQuery.of(context);
-          body = MediaQuery(data: m.copyWith(padding: m.padding.copyWith(top: 38, bottom: 18)), child: body);
+          body = MediaQuery(data: m.copyWith(padding: m.padding.copyWith(top: 62, bottom: 34)), child: body);
         }
         return AnnotatedRegion<SystemUiOverlayStyle>(value: dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark, child: body);
       },

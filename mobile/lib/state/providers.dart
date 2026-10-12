@@ -91,5 +91,5 @@ final inventoryProvider = FutureProvider.autoDispose.family<Paged<Device>, Inven
 
 // ───── Tema
 final themeModeProvider = StateProvider<ThemeMode>((ref) {
-  return switch (ref.read(sessionProvider).themeMode) { 'dark' => ThemeMode.dark, 'light' => ThemeMode.light, _ => ThemeMode.system };
+  return switch (ref.read(sessionProvider).themeMode) { 'dark' => ThemeMode.dark, 'system' => ThemeMode.system, _ => ThemeMode.light };
 });
